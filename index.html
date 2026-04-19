@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FC 26 Tournoi</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#16a34a;--green-light:#dcfce7;--green-mid:#22c55e;
+  --bg:#f0f4f8;--card:#ffffff;--card2:#f8fafc;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#0f172a;--muted:#64748b;--gold:#d97706;
+  --red:#dc2626;--radius:14px;--shadow:0 2px 8px rgba(0,0,0,.07)
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;max-width:480px;margin:0 auto}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#15803d,#16a34a,#22c55e);padding:24px 16px 20px;text-align:center;position:relative;overflow:hidden}
+.hdr::before{content:'⚽';position:absolute;font-size:120px;opacity:.07;right:-20px;top:-20px;transform:rotate(-15deg)}
+.hdr h1{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;letter-spacing:2px;line-height:1}
+.hdr p{font-size:12px;color:rgba(255,255,255,.8);margin-top:5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+
+/* NAV */
+nav{background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:space-around;box-shadow:var(--shadow);position:sticky;top:0;z-index:100}
+nav button{flex:1;background:none;border:none;color:var(--muted);font-size:10px;font-family:'Outfit',sans-serif;padding:11px 4px 9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.2s;border-bottom:2.5px solid transparent;font-weight:500}
+nav button.active{color:var(--green);border-bottom-color:var(--green)}
+nav button svg{width:20px;height:20px}
+
+/* PAGES */
+.page{display:none;padding:14px 12px;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* INPUTS */
+.input-row{display:flex;gap:8px;margin-bottom:10px}
+input[type=text],input[type=number]{background:#fff;border:1.5px solid var(--border2);color:var(--text);padding:11px 14px;border-radius:10px;font-size:15px;font-family:'Outfit',sans-serif;width:100%}
+input[type=text]::placeholder{color:#94a3b8}
+input[type=text]:focus,input[type=number]:focus{outline:none;border-color:var(--green)}
+
+/* BUTTONS */
+.btn{background:var(--green);color:#fff;border:none;padding:11px 18px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{opacity:.85;transform:scale(.97)}
+.btn.sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.btn.outline{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+.btn.danger{background:#fee2e2;color:var(--red);border:1.5px solid #fecaca}
+.btn.gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:700}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.full{width:100%;justify-content:center;padding:13px}
+
+/* SECTION TITLE */
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:var(--text);margin-bottom:12px}
+
+/* PLAYER CHIP */
+.player-chip{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:7px;box-shadow:var(--shadow)}
+.player-chip .num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green);min-width:26px}
+.player-chip .name{font-size:15px;font-weight:500;flex:1;padding:0 8px}
+.player-chip .remove{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:22px;line-height:1;padding:0 2px;transition:.15s}
+.player-chip .remove:hover{color:var(--red)}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.badge.green{background:var(--green-light);color:var(--green)}
+.badge.gray{background:#f1f5f9;color:var(--muted)}
+.badge.gold{background:#fef3c7;color:var(--gold)}
+
+/* ALERT */
+.alert{border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:10px;border:1.5px solid;font-weight:500}
+.alert.info{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.alert.success{background:var(--green-light);color:#15803d;border-color:#86efac}
+.alert.warning{background:#fef3c7;color:var(--gold);border-color:#fde68a}
+
+/* MATCH CARD */
+.match-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.match-header span{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.match-teams{display:grid;grid-template-columns:1fr 80px 1fr;align-items:center;gap:6px;margin-bottom:12px}
+.team-name{font-size:13px;font-weight:700;text-align:center;line-height:1.2}
+.score-row{display:flex;gap:5px;align-items:center;justify-content:center}
+.score-input{width:40px;height:40px;text-align:center;font-size:18px;font-weight:700;background:var(--card2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Outfit',sans-serif;padding:0}
+.score-input:focus{outline:none;border-color:var(--green)}
+.vs-label{font-family:'Bebas Neue',sans-serif;font-size:13px;color:#94a3b8}
+.score-display{font-family:'Bebas Neue',sans-serif;font-size:28px;display:flex;align-items:center;gap:6px;justify-content:center}
+.score-display .sep{font-size:18px;color:#94a3b8}
+.match-actions{display:flex;justify-content:flex-end}
+
+/* STANDINGS */
+.table-wrap{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--border);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:#fff}
+thead{background:var(--card2)}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:9px 8px;text-align:left;font-weight:700}
+th.c{text-align:center}
+td{padding:10px 8px;font-size:13px;border-top:1px solid var(--border)}
+td.c{text-align:center;color:var(--muted);font-weight:500}
+tr.top{background:#f0fdf4}
+.pos{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.pos.p1{background:#fbbf24;color:#78350f}
+.pos.p2{background:#94a3b8;color:#fff}
+.pos.p3{background:#d97706;color:#fff}
+.pos.px{background:#f1f5f9;color:var(--muted)}
+.pts-val{font-weight:800;font-size:15px;color:var(--green)}
+.qual-tag{font-size:9px;color:var(--green);font-weight:700;letter-spacing:.3px;display:block}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--green);line-height:1}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;font-weight:600}
+
+/* BRACKET */
+.round-label{font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--muted);letter-spacing:2px;text-align:center;margin:16px 0 8px;text-transform:uppercase}
+.bm{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.bm-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font-size:14px;font-weight:600}
+.bm-row.win{background:var(--green-light);color:var(--green)}
+.bm-row.lose{background:#f8fafc;color:#94a3b8;font-weight:400}
+.bm-score{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:26px;text-align:center}
+.bm-div{height:1px;background:var(--border)}
+.bm-inputs{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 14px;background:var(--card2)}
+.bm-score-in{width:48px;height:44px;text-align:center;font-size:20px;font-weight:700;background:#fff;border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Outfit',sans-serif;padding:0}
+.bm-score-in:focus{outline:none;border-color:var(--green)}
+
+/* CHAMPION */
+.champion-card{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #fbbf24;border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:12px}
+.trophy-icon{font-size:56px;line-height:1;margin-bottom:8px}
+.champ-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:4px}
+.champ-name{font-family:'Bebas Neue',sans-serif;font-size:40px;color:#92400e;letter-spacing:1px}
+
+.empty{text-align:center;padding:36px 16px;color:var(--muted);font-size:14px;line-height:1.6}
+.empty .icon{font-size:36px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>FC 26 TOURNOI</h1>
+  <p id="hdr-sub">Gérez votre tournoi entre amis</p>
+</div>
+
+<nav>
+  <button class="active" onclick="goto('joueurs')" id="tab-joueurs">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Joueurs
+  </button>
+  <button onclick="goto('matchs')" id="tab-matchs">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Matchs
+  </button>
+  <button onclick="goto('classement')" id="tab-classement">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    Classement
+  </button>
+  <button onclick="goto('finale')" id="tab-finale">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Finale
+  </button>
+</nav>
+
+<!-- JOUEURS -->
+<div class="page active" id="page-joueurs">
+  <p class="section-title">Joueurs du tournoi</p>
+  <div class="input-row">
+    <input type="text" id="player-input" placeholder="Nom du joueur..." maxlength="20" onkeydown="if(event.key==='Enter')addPlayer()">
+    <button class="btn" onclick="addPlayer()">+ Ajouter</button>
+  </div>
+  <div id="player-list"></div>
+  <div class="alert info" id="player-info">Ajoute entre 4 et 10 joueurs pour commencer.</div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn gold" id="btn-gen" onclick="generateMatches()" disabled>🎲 Générer les matchs</button>
+    <button class="btn danger sm" onclick="resetAll()" style="margin-left:auto">🗑 Reset</button>
+  </div>
+</div>
+
+<!-- MATCHS -->
+<div class="page" id="page-matchs">
+  <p class="section-title">Matchs de poule</p>
+  <div id="matches-list"><div class="empty"><div class="icon">⚽</div>Génère les matchs depuis l'onglet Joueurs.</div></div>
+</div>
+
+<!-- CLASSEMENT -->
+<div class="page" id="page-classement">
+  <p class="section-title">Classement</p>
+  <div id="standings-content"><div class="empty"><div class="icon">📊</div>Aucun match joué pour l'instant.</div></div>
+</div>
+
+<!-- FINALE -->
+<div class="page" id="page-finale">
+  <p class="section-title">Phase Finale</p>
+  <div id="bracket-content"><div class="empty"><div class="icon">🏆</div>Complète la phase de poule pour accéder aux finales.</div></div>
+</div>
+
+<script>
+let S={players:[],matches:[],bracket:{semis:[],final:null},champion:null};
+const KEY='fc26_v2';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{let d=localStorage.getItem(KEY);if(d)S=JSON.parse(d)}catch(e){}}
+load();
+
+function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function goto(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
+  ({joueurs:renderPlayers,matchs:renderMatches,classement:renderStandings,finale:renderBracket}[p])();
+}
+
+function addPlayer(){
+  let inp=document.getElementById('player-input'),name=inp.value.trim();
+  if(!name)return;
+  if(S.players.length>=10)return alert('Maximum 10 joueurs !');
+  if(S.players.find(p=>p.toLowerCase()===name.toLowerCase()))return alert('Joueur déjà dans la liste !');
+  S.players.push(name);inp.value='';save();renderPlayers();
+}
+
+function removePlayer(i){
+  if(S.matches.length>0&&!confirm('Supprimer ce joueur réinitialisera les matchs. Continuer ?'))return;
+  if(S.matches.length>0){S.matches=[];S.bracket={semis:[],final:null};S.champion=null;}
+  S.players.splice(i,1);save();renderPlayers();
+}
+
+function renderPlayers(){
+  let n=S.players.length;
+  document.getElementById('player-list').innerHTML=S.players.map((p,i)=>`
+    <div class="player-chip">
+      <span class="num">${i+1}</span>
+      <span class="name">${esc(p)}</span>
+      <button class="remove" onclick="removePlayer(${i})">×</button>
+    </div>`).join('');
+  document.getElementById('player-info').className='alert '+(n>=4?'success':'info');
+  document.getElementById('player-info').textContent=
+    n===0?'Ajoute entre 4 et 10 joueurs pour commencer.':
+    n<4?`${n} joueur(s) — il en faut au moins 4.`:
+    `✅ ${n} joueurs prêts.${S.matches.length?' Matchs déjà générés.':' Tu peux générer les matchs !'}`;
+  document.getElementById('btn-gen').disabled=n<4||S.matches.length>0;
+  document.getElementById('hdr-sub').textContent=n>0?`${n} joueurs · Édition FC 26`:'Gérez votre tournoi entre amis';
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+function generateMatches(){
+  if(S.players.length<4)return;
+  S.matches=[];S.bracket={semis:[],final:null};S.champion=null;
+  let ps=[...S.players];
+  for(let i=0;i<ps.length-1;i++)for(let j=i+1;j<ps.length;j++)
+    S.matches.push({h:ps[i],a:ps[j],sh:null,sa:null,played:false});
+  shuffle(S.matches);save();renderPlayers();goto('matchs');
+}
+
+function renderMatches(){
+  let el=document.getElementById('matches-list');
+  if(!S.matches.length){el.innerHTML='<div class="empty"><div class="icon">⚽</div>Génère les matchs depuis l\'onglet Joueurs.</div>';return;}
+  let played=S.matches.filter(m=>m.played).length,total=S.matches.length;
+  let html=`<div class="alert ${played===total?'success':'info'}" style="margin-bottom:12px">${played}/${total} matchs joués${played===total?' ✅ Classement complet !':''}</div>`;
+  html+=S.matches.map((m,i)=>{
+    if(m.played){
+      let hw=m.sh>m.sa,aw=m.sa>m.sh;
+      return `<div class="match-card">
+        <div class="match-header"><span>Match ${i+1}</span><span class="badge green">Joué</span></div>
+        <div class="match-teams">
+          <div class="team-name" style="color:${hw?'var(--green)':'#94a3b8'}">${esc(m.h)}</div>
+          <div class="score-display">
+            <span style="color:${hw?'var(--green)':'#94a3b8'}">${m.sh}</span>
+            <span class="sep">-</span>
+            <span style="color:${aw?'var(--green)':'#94a3b8'}">${m.sa}</span>
+          </div>
+          <div class="team-name" style="color:${aw?'var(--green)':'#94a3b8'}">${esc(m.a)}</div>
+        </div>
+        <div class="match-actions"><button class="btn outline sm" onclick="editMatch(${i})">✏️ Modifier</button></div>
+      </div>`;
+    }
+    return `<div class="match-card">
+      <div class="match-header"><span>Match ${i+1}</span><span class="badge gray">En attente</span></div>
+      <div class="match-teams">
+        <div class="team-name">${esc(m.h)}</div>
+        <div class="score-row">
+          <input type="number" class="score-input" id="sh${i}" min="0" max="99" placeholder="0">
+          <span class="vs-label">-</span>
+          <input type="number" class="score-input" id="sa${i}" min="0" max="99" placeholder="0">
+        </div>
+        <div class="team-name">${esc(m.a)}</div>
+      </div>
+      <div class="match-actions"><button class="btn sm" onclick="saveMatch(${i})">✓ Valider</button></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=html;
+}
+
+function saveMatch(i){
+  let sh=parseInt(document.getElementById('sh'+i).value),sa=parseInt(document.getElementById('sa'+i).value);
+  if(isNaN(sh)||isNaN(sa)||sh<0||sa<0)return alert('Entre des scores valides !');
+  S.matches[i].sh=sh;S.matches[i].sa=sa;S.matches[i].played=true;
+  save();renderMatches();
+  if(S.matches.every(m=>m.played))setTimeout(()=>{if(confirm('Tous les matchs joués ! Voir le classement ?'))goto('classement');},300);
+}
+
+function editMatch(i){S.matches[i].played=false;S.matches[i].sh=S.matches[i].sa=null;save();renderMatches();}
+
+function getStandings(){
+  let st={};
+  S.players.forEach(p=>{st[p]={name:p,pts:0,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0};});
+  S.matches.filter(m=>m.played).forEach(m=>{
+    let h=st[m.h],a=st[m.a];if(!h||!a)return;
+    h.played++;a.played++;h.gf+=m.sh;h.ga+=m.sa;a.gf+=m.sa;a.ga+=m.sh;
+    h.gd=h.gf-h.ga;a.gd=a.gf-a.ga;
+    if(m.sh>m.sa){h.pts+=3;h.w++;a.l++;}
+    else if(m.sh<m.sa){a.pts+=3;a.w++;h.l++;}
+    else{h.pts++;a.pts++;h.d++;a.d++;}
+  });
+  return Object.values(st).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+}
+
+function renderStandings(){
+  let el=document.getElementById('standings-content');
+  let st=getStandings();
+  let allPlayed=S.matches.length>0&&S.matches.every(m=>m.played);
+  let nSemi=S.players.length>=6?4:2;
+  let played=S.matches.filter(m=>m.played).length;
+  let html=`<div class="stat-grid">
+    <div class="stat-box"><div class="stat-val">${played}</div><div class="stat-lbl">Matchs joués</div></div>
+    <div class="stat-box"><div class="stat-val">${S.matches.length}</div><div class="stat-lbl">Total matchs</div></div>
+  </div>`;
+  if(allPlayed)html+=`<div class="alert success">🏆 Poule terminée ! Top ${nSemi} qualifiés.</div>`;
+  html+=`<div class="table-wrap"><table><thead><tr>
+    <th style="width:32px"></th><th>Joueur</th>
+    <th class="c">Pts</th><th class="c">V</th><th class="c">N</th><th class="c">D</th><th class="c">+/-</th>
+  </tr></thead><tbody>`;
+  st.forEach((p,i)=>{
+    let top=i<nSemi,pc=i===0?'p1':i===1?'p2':i===2?'p3':'px';
+    html+=`<tr class="${top?'top':''}">
+      <td><span class="pos ${pc}">${i+1}</span></td>
+      <td><span style="font-weight:${top?700:400}">${esc(p.name)}</span>${top&&allPlayed?'<span class="qual-tag">✓ Qualifié</span>':''}</td>
+      <td class="c"><span class="pts-val">${p.pts}</span></td>
+      <td class="c">${p.w}</td><td class="c">${p.d}</td><td class="c">${p.l}</td>
+      <td class="c" style="color:${p.gd>0?'var(--green)':p.gd<0?'var(--red)':'var(--muted)'}">${p.gd>0?'+':''}${p.gd}</td>
+    </tr>`;
+  });
+  html+='</tbody></table></div>';
+  if(allPlayed&&!S.bracket.semis.length)
+    html+=`<button class="btn gold full" style="margin-top:14px" onclick="generateBracket()">⚡ Lancer les phases finales</button>`;
+  el.innerHTML=html;
+}
+
+function generateBracket(){
+  let st=getStandings(),nSemi=S.players.length>=6?4:2,q=st.slice(0,nSemi);
+  S.bracket={semis:[],final:null};S.champion=null;
+  S.bracket.semis=nSemi===4?[
+    {h:q[0].name,a:q[3].name,sh:null,sa:null,played:false},
+    {h:q[1].name,a:q[2].name,sh:null,sa:null,played:false}
+  ]:[{h:q[0].name,a:q[1].name,sh:null,sa:null,played:false}];
+  save();goto('finale');
+}
+
+function renderBracket(){
+  let el=document.getElementById('bracket-content');
+  if(!S.bracket.semis.length){el.innerHTML='<div class="empty"><div class="icon">🏆</div>Complète la phase de poule pour accéder aux finales.</div>';return;}
+  let html='';
+  let hasSemis=S.bracket.semis.length>1;
+  if(S.champion){
+    html+=`<div class="champion-card">
+      <div class="trophy-icon">🏆</div>
+      <div class="champ-label">Champion FC 26</div>
+      <div class="champ-name">${esc(S.champion)}</div>
+    </div>`;
+  }
+  if(hasSemis){html+='<div class="round-label">⚡ Demi-Finales</div>';S.bracket.semis.forEach((m,i)=>html+=bmHTML(m,'semi',i));}
+  if(S.bracket.final){html+='<div class="round-label">🏅 Finale</div>';html+=bmHTML(S.bracket.final,'final',0);}
+  else if(!hasSemis){html+='<div class="round-label">🏅 Finale</div>';html+=bmHTML(S.bracket.semis[0],'semi',0);}
+  el.innerHTML=html;
+}
+
+function bmHTML(m,type,idx){
+  if(m.played){
+    let hw=m.sh>m.sa,aw=m.sa>m.sh;
+    return `<div class="bm">
+      <div class="bm-row ${hw?'win':'lose'}">${esc(m.h)}<span class="bm-score">${m.sh}</span></div>
+      <div class="bm-div"></div>
+      <div class="bm-row ${aw?'win':'lose'}">${esc(m.a)}<span class="bm-score">${m.sa}</span></div>
+    </div>`;
+  }
+  if(type==='final'&&!S.bracket.semis.every(s=>s.played))
+    return `<div class="bm"><div class="bm-row" style="color:#94a3b8;font-style:italic">En attente des demi-finales...</div></div>`;
+  return `<div class="bm">
+    <div class="bm-row">${esc(m.h)}</div>
+    <div class="bm-div"></div>
+    <div class="bm-row">${esc(m.a)}</div>
+    <div class="bm-inputs">
+      <input type="number" class="bm-score-in" id="b-sh-${type}-${idx}" min="0" max="99" placeholder="0">
+      <span style="font-family:'Bebas Neue';font-size:16px;color:#94a3b8">VS</span>
+      <input type="number" class="bm-score-in" id="b-sa-${type}-${idx}" min="0" max="99" placeholder="0">
+      <button class="btn sm" style="margin-left:8px" onclick="saveBM('${type}',${idx})">✓ Valider</button>
+    </div>
+  </div>`;
+}
+
+function saveBM(type,idx){
+  let sh=parseInt(document.getElementById(`b-sh-${type}-${idx}`).value);
+  let sa=parseInt(document.getElementById(`b-sa-${type}-${idx}`).value);
+  if(isNaN(sh)||isNaN(sa)||sh<0||sa<0)return alert('Entre des scores valides !');
+  if(sh===sa)return alert('Égalité non permise ! Jouez les tirs au but et entrez un score différent.');
+  let m=type==='semi'?S.bracket.semis[idx]:S.bracket.final;
+  m.sh=sh;m.sa=sa;m.played=true;
+  let winner=sh>sa?m.h:m.a,hasSemis=S.bracket.semis.length>1;
+  if(hasSemis&&type==='semi'&&S.bracket.semis.every(s=>s.played)){
+    let w1=S.bracket.semis[0].sh>S.bracket.semis[0].sa?S.bracket.semis[0].h:S.bracket.semis[0].a;
+    let w2=S.bracket.semis[1].sh>S.bracket.semis[1].sa?S.bracket.semis[1].h:S.bracket.semis[1].a;
+    S.bracket.final={h:w1,a:w2,sh:null,sa:null,played:false};
+    setTimeout(()=>alert(`Finalistes : ${w1} vs ${w2} !`),200);
+  } else if(!hasSemis&&type==='semi'){S.champion=winner;setTimeout(()=>alert(`🏆 CHAMPION : ${winner} !`),200);}
+  else if(type==='final'){S.champion=winner;setTimeout(()=>alert(`🏆 CHAMPION FC 26 : ${winner} !`),200);}
+  save();renderBracket();
+}
+
+function resetAll(){
+  if(!confirm('Remettre à zéro tout le tournoi ?'))return;
+  S={players:[],matches:[],bracket:{semis:[],final:null},champion:null};
+  save();goto('joueurs');
+}
+
+renderPlayers();
+</script>
+</body>
+</html>
